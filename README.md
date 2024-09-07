@@ -1,6 +1,6 @@
 # ①	JS5 - APIを使ったアプリ-プロダクト名
 
-NHK子供向けオススメ番組
+NHK子供向けオススメ番組＜途中＞
 
 ## ②課題内容（どんな作品か）
 
@@ -8,7 +8,7 @@ NHK子供向けオススメ番組
 
 ## ③DEMO
 
-
+https://github.com/michiesekiguchi/6th_assignment_kadai05_api
 
 ## ④作ったアプリケーション用のIDまたはPasswordがある場合
 
