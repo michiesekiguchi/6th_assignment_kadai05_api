@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NHK子供番組おすすめ</title>
+
+</head>
+<body>
+    <div>
+        <h1>
+           <span id="area"></span> NHK子供向け番組検索
+        </h1>
+    </div>
+<!-- 選択項目 -->
+<div>
+    <label for="area">地域を選択:</label>
+    <select id="area">
+        <option value="130">東京</option>
+        <option value="140">横浜</option>
+        <option value="110">さいたま</option>
+        <option value="120">千葉</option>
+        <option value="080">水戸</option>
+        <option value="090">宇都宮</option>
+        <option value="100">前橋</option>
+    </select>
+    <br>
+
+    <label for="service">チャンネルを選択:</label>
+    <select id="service">
+        <option value="g1">ＮＨＫ総合１</option>
+        <option value="g2">ＮＨＫ総合２</option>
+        <option value="e1">ＮＨＫＥテレ１</option>
+        <option value="e2">ＮＨＫＥテレ２</option>
+        <option value="e3">ＮＨＫＥテレ３</option>
+    </select>
+    <br>
+
+    <label for="genre">番組ジャンルを選択:</label>
+    <select id="genre">
+        <option value="0409">音楽番組</option>
+        <option value="0700">アニメ</option>
+        <option value="0800">教養番組</option>
+    </select>
+    <br>
+
+    <label for="date">日付を選択:</label>
+    <input type="date" id="date">
+    <br><br>
+
+    <button id="search">番組を検索</button>
+</div>
+
+<!-- 結果表示エリア -->
+<div id="result"></div>
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<script>
+    const apikey = ''; // 自分のAPIキーを入力
+
+    $("#search").on("click", function() {
+        const area = $("#area").val();
+        const service = $("#service").val();
+        const genre = $("#genre").val();
+        const date = $("#date").val();
+
+        // API URLの生成
+        const url = `https://api.nhk.or.jp/v2/pg/genre/{area}/{service}/{genre}/{date}.json?key={apikey}`;
+
+        // 番組情報を取得
+        $.getJSON(url, function(data) {
+            // 結果のクリア
+            $("#result").empty();
+
+            if (data.list[service]) {
+                $.each(data.list[service], function(index, program) {
+                    // 番組情報を表示
+                    const programElement = `
+                        <div>
+                            <h2>${program.title}</h2>
+                            <p><strong>放送開始:</strong> ${new Date(program.start_time).toLocaleString()}</p>
+                            <p><strong>放送終了:</strong> ${new Date(program.end_time).toLocaleString()}</p>
+                            <p><strong>内容:</strong> ${program.subtitle}</p>
+                            <hr>
+                        </div>`;
+                    $("#result").append(programElement);
+                });
+            } else {
+                $("#result").html('<p>番組が見つかりませんでした。</p>');
+            }
+        }).fail(function() {
+            $("#result").html('<p>データの取得に失敗しました。</p>');
+        });
+    });
+</script>
+
+
+<!-- //     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+//     <script>
+//         //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+//         //MAP表示処理
+//         //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+//         const key   = "SWYmdOo42QxnAo4wrw42AhKBmUsALpQ0";  //***自分のKEYを！！！！！！！！！！！！！！！***
+//         const area   = "130:東京";   //
+//         const service  = "";  //
+//         const icon  = "http://openweathermap.org/img/wn/"; //ICONにアクセスするURL
+
+//         //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+//         //OpenWeatherAPI（天気情報を取得）5DAY/3hour
+//         //＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+//         const url = 'https://api.nhk.or.jp/v2/pg/genre/{area}/{service}/{genre}/{date}.json?key={apikey}';
+
+//         $.ajax({
+//             url:url,
+//             type:'get',
+//             cache:false,
+//             dataType:'json'
+//         }).done(function(data){
+//             // console.log(data.list[0].dt_txt);//オブジェクト変数を確認
+//             console.log(data);
+
+//             let html="";
+//             for(let i=0; i<data.list.length; i++){ //html += 「＋」があると前にあった値にどんどん追加していく
+//                 html+= `
+//                 <div>
+//                     <div>時刻：${data.list[i].dt_txt}</div>
+//                     <div>風速：${data.list[i].wind.speed}</div>
+//                     <div>天気：${data.list[i].weather[0].description}</div>
+//                     <div>降水確率：${data.list[i].pop*100}%</div>
+//                     <div><img src ="${icon+data.list[i].weather[0].icon}@2x.png"></div>
+//                 </div>
+//             `;
+//             }
+
+
+//             // 上で作成したhtmlを埋め込む
+//             $("#view").append(html);
+            
+//             // 場所
+//             $("#area").html(data.city.name)
+
+//         })
+   
+        
+//     </script> --> 
+</body>
+</html>
