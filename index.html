@@ -70,33 +70,45 @@
 
         // API URLの生成
         const url = `https://api.nhk.or.jp/v2/pg/genre/{area}/{service}/{genre}/{date}.json?key={apikey}`;
+        
+        // AJAXリクエスト
+        $.ajax({
+            url: url,
+            type: 'get',
+            cache: false,
+            dataType: 'json'
+        }).done(function(data) {
+            if (data.list[service] && data.list[service].length > 0) {
+                // 番組情報を抽出
+                const program = data.list[service][0]; // 最初の番組を取得
+                const logoUrl = program.service.logo_m.url; // 中サイズのロゴ
+                const title = program.title; // 番組名
+                const startTime = program.start_time; // 放送開始時間
+                const endTime = program.end_time; // 放送終了時間
 
-        // 番組情報を取得
-        $.getJSON(url, function(data) {
-            // 結果のクリア
-            $("#result").empty();
+                // コンソールに表示
+                console.log('Logo URL:', logoUrl);
+                console.log('Title:', title);
+                console.log('Start Time:', startTime);
+                console.log('End Time:', endTime);
 
-            if (data.list[service]) {
-                $.each(data.list[service], function(index, program) {
-                    // 番組情報を表示
-                    const programElement = `
-                        <div>
-                            <h2>${program.title}</h2>
-                            <p><strong>放送開始:</strong> ${new Date(program.start_time).toLocaleString()}</p>
-                            <p><strong>放送終了:</strong> ${new Date(program.end_time).toLocaleString()}</p>
-                            <p><strong>内容:</strong> ${program.subtitle}</p>
-                            <hr>
-                        </div>`;
-                    $("#result").append(programElement);
-                });
-            } else {
-                $("#result").html('<p>番組が見つかりませんでした。</p>');
-            }
-        }).fail(function() {
-            $("#result").html('<p>データの取得に失敗しました。</p>');
+                // 結果をHTMLに表示
+                $('#result').html(`
+                    <img src="${logoUrl}" alt="番組ロゴ"><br>
+                    <strong>放送開始:</strong> ${startTime}<br>
+                    <strong>放送終了:</strong> ${endTime}<br>
+                    <strong>番組名:</strong> ${title}<br>
+                    `);
+                } else {
+                    console.log('番組情報が見つかりませんでした。');
+                    $('#result').html('番組情報が見つかりませんでした。');
+                }
+            }).fail(function(error) {
+                console.error('データ取得に失敗しました:', error);
+                $('#result').html('データ取得に失敗しました。');
+            });
         });
-    });
-</script>
+    </script>
 
 
 <!-- //     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
