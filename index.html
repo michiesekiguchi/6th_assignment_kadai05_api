@@ -5,111 +5,100 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NHK子供番組おすすめ</title>
-
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </head>
 <body>
     <div>
-        <h1>
-           <span id="area"></span> NHK子供向け番組検索
-        </h1>
+        <h1>NHK子供向け番組検索</h1>
     </div>
-<!-- 選択項目 -->
-<div>
-    <label for="area">地域を選択:</label>
-    <select id="area">
-        <option value="130">東京</option>
-        <option value="140">横浜</option>
-        <option value="110">さいたま</option>
-        <option value="120">千葉</option>
-        <option value="080">水戸</option>
-        <option value="090">宇都宮</option>
-        <option value="100">前橋</option>
-    </select>
-    <br>
 
-    <label for="service">チャンネルを選択:</label>
-    <select id="service">
-        <option value="g1">ＮＨＫ総合１</option>
-        <option value="g2">ＮＨＫ総合２</option>
-        <option value="e1">ＮＨＫＥテレ１</option>
-        <option value="e2">ＮＨＫＥテレ２</option>
-        <option value="e3">ＮＨＫＥテレ３</option>
-    </select>
-    <br>
+    <!-- 選択項目 -->
+    <div>
+        <label for="area">地域を選択:</label>
+        <select id="area">
+            <option value="130">東京</option>
+            <option value="140">横浜</option>
+            <option value="110">さいたま</option>
+            <option value="120">千葉</option>
+            <option value="080">水戸</option>
+            <option value="090">宇都宮</option>
+            <option value="100">前橋</option>
+        </select>
+        <br>
 
-    <label for="genre">番組ジャンルを選択:</label>
-    <select id="genre">
-        <option value="0409">音楽番組</option>
-        <option value="0700">アニメ</option>
-        <option value="0800">教養番組</option>
-    </select>
-    <br>
+        <label for="service">チャンネルを選択:</label>
+        <select id="service">
+            <option value="g1">ＮＨＫ総合１</option>
+            <option value="g2">ＮＨＫ総合２</option>
+            <option value="e1">ＮＨＫＥテレ１</option>
+            <option value="e2">ＮＨＫＥテレ２</option>
+            <option value="e3">ＮＨＫＥテレ３</option>
+        </select>
+        <br>
 
-    <label for="date">日付を選択:</label>
-    <input type="date" id="date">
-    <br><br>
+        <label for="genre">番組ジャンルを選択:</label>
+        <select id="genre">
+            <option value="0409">音楽番組</option>
+            <option value="0700">アニメ</option>
+            <option value="0800">教養番組</option>
+        </select>
+        <br>
 
-    <button id="search">番組を検索</button>
-</div>
+        <label for="date">日付を選択:</label>
+        <input type="date" id="date">
+        <br><br>
 
-<!-- 結果表示エリア -->
-<div id="result"></div>
+        <button id="search">番組を検索</button>
+    </div>
 
+    <!-- 結果表示エリア -->
+    <div id="result"></div>
 
+    <script>
+        const apikey = ''; // APIキー
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        $("#search").on("click", function() {
+            const area = $("#area").val();
+            const service = $("#service").val();
+            const genre = $("#genre").val();
+            const date = $("#date").val();
 
-<script>
-    const apikey = ''; // 自分のAPIキーを入力
+            // API URLの生成
+            const url = `https://api.nhk.or.jp/v2/pg/genre/${area}/${service}/${genre}/${date}.json?key=${apikey}`;
 
-    $("#search").on("click", function() {
-        const area = $("#area").val();
-        const service = $("#service").val();
-        const genre = $("#genre").val();
-        const date = $("#date").val();
+            // AJAXリクエスト
+            $.ajax({
+                url: url,
+                type: 'get',
+                cache: false,
+                dataType: 'json'
+            }).done(function(data) {
+            console.log(data);  // ここでレスポンス全体を確認
+                if (data.list[service] && data.list[service].length > 0) {
+                    // 番組情報を抽出
+                    const program = data.list[service][0]; // 最初の番組を取得
+                    const logoUrl = program.service.logo_m.url; // 中サイズのロゴ
+                    const title = program.title; // 番組名
+                    const startTime = program.start_time; // 放送開始時間
+                    const endTime = program.end_time; // 放送終了時間
 
-        // API URLの生成
-        const url = `https://api.nhk.or.jp/v2/pg/genre/{area}/{service}/{genre}/{date}.json?key={apikey}`;
-        
-        // AJAXリクエスト
-        $.ajax({
-            url: url,
-            type: 'get',
-            cache: false,
-            dataType: 'json'
-        }).done(function(data) {
-            if (data.list[service] && data.list[service].length > 0) {
-                // 番組情報を抽出
-                const program = data.list[service][0]; // 最初の番組を取得
-                const logoUrl = program.service.logo_m.url; // 中サイズのロゴ
-                const title = program.title; // 番組名
-                const startTime = program.start_time; // 放送開始時間
-                const endTime = program.end_time; // 放送終了時間
-
-                // コンソールに表示
-                console.log('Logo URL:', logoUrl);
-                console.log('Title:', title);
-                console.log('Start Time:', startTime);
-                console.log('End Time:', endTime);
-
-                // 結果をHTMLに表示
-                $('#result').html(`
-                    <img src="${logoUrl}" alt="番組ロゴ"><br>
-                    <strong>放送開始:</strong> ${startTime}<br>
-                    <strong>放送終了:</strong> ${endTime}<br>
-                    <strong>番組名:</strong> ${title}<br>
+                    // 結果をHTMLに表示
+                    $('#result').html(`
+                        <img src="${logoUrl}" alt="番組ロゴ"><br>
+                        <strong>放送開始:</strong> ${startTime}<br>
+                        <strong>放送終了:</strong> ${endTime}<br>
+                        <strong>番組名:</strong> ${title}<br>
                     `);
                 } else {
-                    console.log('番組情報が見つかりませんでした。');
                     $('#result').html('番組情報が見つかりませんでした。');
                 }
-            }).fail(function(error) {
-                console.error('データ取得に失敗しました:', error);
+            }).fail(function() {
                 $('#result').html('データ取得に失敗しました。');
             });
         });
     </script>
-
+</body>
+</html>
 
 <!-- //     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
 //     <script>
@@ -159,5 +148,3 @@
    
         
 //     </script> --> 
-</body>
-</html>
